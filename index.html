@@ -945,17 +945,20 @@ pre {
             <br>
             
             <figure class="mx-auto">
-                <center><img class="card-img-top" src="./figures/vs_rlhf.jpg" style="width:750px"></center>
+                <center><img class="card-img-top" src="./figures/vs_rlhf.png" style="width:750px"></center>
                 <br>
                 <figcaption style="text-align: left;">
                     Performance of <i>Aligner</i> on the Various Preference Datasets<br>
                     To demonstrate the independence of <i>Aligner</i> from specific datasets, we utilized various open-source RLHF preference datasets. Specifically, we trained on HH-RLHF<cite>
                         Training a helpful and harmless assistant with reinforcement learning from human feedback.
-                    </cite> and PKU-SafeRLHF <cite>
+                    </cite> ,PKU-SafeRLHF <cite>
                         Beavertails: Towards improved safety alignment of LLM via a human-preference dataset.
                     </cite><cite>
                         Safe rlhf: Safe reinforcement learning from human feedback.
-                    </cite> datasets and compared <i>Aligner</i> with SFT, RLHF, and DPO. After fine-tuning Alpaca-7B with SFT, RLHF, and DPO, we compare these models against the original Alpaca-7B corrected by <i>Aligner</i>. The experiment results (as shown in the table above) indicate that <i>Aligner</i>'s performance in enhancing the original model's capabilities is comparable to, or exceeds, that of the baseline methods. Notably, models finetuned with RLHF or DPO tend to generate either conservative answers or fail to recognize dangers while adding helpful information explicitly. Importantly, training with RLHF or DPO methods requires optimizing significantly more models and consuming more training resources than just training an <i>Aligner</i>, <i>e.g.</i>, for a 70B model, DPO needs 11.25 times and RLHF 22.5 times more resources than <i>Aligner</i>. 
+                    </cite> and Utral-Feedback <cite>
+                        UltraFeedback: Boosting Language Models with Scaled AI Feedback
+                    </cite>
+                        datasets and compared <i>Aligner</i> with SFT, RLHF, and DPO. After fine-tuning Alpaca-7B with SFT, RLHF, and DPO, we compare these models against the original Alpaca-7B corrected by <i>Aligner</i>. The experiment results (as shown in the table above) indicate that <i>Aligner</i>'s performance in enhancing the original model's capabilities is comparable to, or exceeds, that of the baseline methods. Notably, models finetuned with RLHF or DPO tend to generate either conservative answers or fail to recognize dangers while adding helpful information explicitly. Importantly, training with RLHF or DPO methods requires optimizing significantly more models and consuming more training resources than just training an <i>Aligner</i>, <i>e.g.</i>, for a 70B model, DPO needs 11.25 times and RLHF 22.5 times more resources than <i>Aligner</i>. 
                 </figcaption>
             </figure>
     
@@ -963,8 +966,9 @@ pre {
 
     <section id="application">
         <hr>
-        <h2>Applications (Multi-round RLHF training via Aligner)</h2>
+        <h2>Applications</h2>
         <!-- <p style="font-size: 23px;"><b></b></p> -->
+        <p style="font-size: 23px;"><strong> #1: Multi-round RLHF training via Aligner</strong></p>
         <p style="font-size: 20px;"><b>New Multi-round Training Pipeline</b></p>
         <p>As a data augmentation tool, <i>Aligner</i> can enhance the upstream model's response \(A\) into an improved response \(A^*\), thereby forming a synthetic preference dataset. This dataset can be used to further train the upstream model via RLHF/DPO. Repeating this process allows for multi-round RLHF or DPO.</p>
         <figure class="mx-auto">
@@ -989,7 +993,32 @@ pre {
             </figcaption>
         </figure>
 
-        <p style="font-size: 23px;"><strong>Weak-to-Strong Correction via Aligner</strong></p>
+        <p style="font-size: 23px;"><strong> #2: A New Alternative to Inference-time Intervention Methods</strong></p>
+        <p> We also conducted supplementary experiments with BoN and beam search as alternative inference-time intervention methods. <i>Aligner</i> continues to demonstrate superior performance compared to these approaches. </p>
+        <p style="font-size: 20px;"><b>Performance</b></p>
+        <figure class="mx-auto">
+            <center><img class="card-img-top" src="./figures/vs_bon.png" style="width:750px"></center>
+            <br>
+            <figcaption style="text-align: left;">
+                This table shows that <i>Aligner</i> consistently outperforms inference-time intervention methods such as BoN with N = 5 and N = 10, as well as <i>Beam Search (BS)</i>, across various settings. All assessments are conducted by integrating <i>Aligner</i> with different upstream models and then compare the results with upstream models inferenced using inference-time intervention methods <i>(X)</i> to measure the percentage increase in the <i>3H</i> standard.
+            </figcaption>
+        </figure>
+
+        <p style="font-size: 23px;"><strong> #3: Controllable Refinement</strong></p>
+        <p> <i>When refining the model's answer using <i>Aligner</i>, can providing feedback during the refinement process improve performance?</i></p>
+
+        <p> To explore this, we conduct a validation experiment where feedback is incorporated into <i>Aligner</i>'s refinement process. Rather than performing additional fine-tuning, we integrated specific prompts as feedback during <i>Aligner</i>'s refinement of the pre-aligned model's responses. In these experiments, <i>Aligner</i> was instructed to prioritize empathy, helpfulness, or harmlessness.</p>
+        <p style="font-size: 20px;"><b>Performance</b></p>
+        <figure class="mx-auto">
+            <center><img class="card-img-top" src="./figures/control_refinement.png" style="width:500px"></center>
+            <br>
+            <figcaption style="text-align: left;">
+                After evaluating on the BeaverTails and empathy datasets, we observed that the trained <i>Aligner</i> retained its instruction-following capabilities and showed metric improvements with the specific feedback provided.
+            </figcaption>
+        </figure>
+        <p>These experiments demonstrate that, once trained, <i>Aligner</i> can incorporate prompt-based feedback during refinement to achieve fine-grained adjustments. The above finding enhances <i>Aligner</i>'s versatility and applicability in real-world scenarios. By using prompts, we can guide <i>Aligner</i>'s refinement to achieve precise adjustments, such as in an Instruct-<i>Aligner</i> setup.</p>
+
+        <p style="font-size: 23px;"><strong>#4: Weak-to-Strong Correction via Aligner</strong></p>
         <p>As AI systems reach human-level performance across various tasks and undertake increasingly complex activities that are hard for humans to grasp, it becomes progressively challenging to provide ongoing, reliable feedback and ensure that their behaviors align with human intentions. This brings forth the significant issue of the Superalignment problem: <em>How can we deliver supervisory signals to advanced AI systems and ensure they remain aligned with human goals?</em><cite> 
             AI Alignment: a Comprehensive Survey
         </cite><cite>
